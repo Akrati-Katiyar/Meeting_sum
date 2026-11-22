@@ -1,0 +1,45 @@
+Meeting Title: Q4 Product Roadmap & Sprint Planning
+Date: November 17, 2026
+Attendees:
+- Priya Sharma (Product Lead)
+- Arjun Patel (Tech Lead)
+- Sara Khan (UI/UX Designer)
+- David Miller (DevOps Engineer)
+
+[00:00 - 02:15] Introduction & Agenda
+Priya: Morning everyone. Thanks for joining. Today's main focus is finalizing the Q4 deliverables for the customer portal redesign and reviewing the latency issues reported last week in production.
+Arjun: Sounds good. We also need to discuss cloud infrastructure cost optimization before the end of the month.
+Priya: Noted. Let's start with the portal redesign. Sara, how are the wireframes progressing?
+
+[02:16 - 08:30] Discussion: Customer Portal Redesign
+Sara: The usability tests for the new dashboard concluded on Friday. 85% of users found the new layout significantly more intuitive. However, the multi-factor authentication (MFA) step confused several test participants because the SMS verification was delayed.
+Arjun: That delay is due to the legacy SMS gateway provider. We already decided in the last architecture review to switch to Twilio or authenticator apps (TOTP).
+Priya: Excellent. Can we make TOTP the default and keep SMS as a fallback?
+Arjun: Yes, we can do that in Sprint 14.
+Sara: Perfect. I will update the user flow to feature QR-code authenticator setup as primary. I will have the final high-fidelity Figma designs ready by this Thursday, Nov 20.
+Priya: Great. Decision made: Primary MFA will be TOTP, with SMS secondary.
+
+[08:31 - 15:45] Discussion: Production Latency & Infrastructure
+Arjun: Moving on to the production latency. Last Tuesday during peak traffic, API response times spiked to 1.8 seconds on the search endpoint.
+David: We analyzed the logs and traces. The culprit is unindexed queries hitting the PostgreSQL database alongside Redis cache invalidation spikes.
+Arjun: We need composite indexes added on the product catalog tables and an increased TTL on Redis cache entries.
+David: I can prepare the database migration script and apply the indexing in the staging environment by tomorrow afternoon.
+Priya: Will there be any expected downtime during staging deployment?
+David: Zero downtime. The index will be created concurrently. Once validated in staging, we can push to production during our maintenance window on Sunday at 2 AM.
+Priya: Approved. David owns the staging migration by Wednesday and production rollout on Sunday.
+
+[15:46 - 21:10] Discussion: Budget & Next Steps
+Arjun: Regarding AWS cloud costs, we are currently 12% over budget due to unused development instances remaining active over weekends.
+David: I have written an AWS Lambda script to auto-stop all non-production EC2 instances at 8 PM on weekdays and over the weekend. That alone will save approximately $1,400 per month.
+Priya: Fantastic. Let's activate that Lambda script immediately.
+Arjun: I will review and approve David's PR for the script by 5 PM today.
+
+[21:11 - 23:00] Summary of Action Items & Wrap-up
+Priya: Quick recap before we sign off:
+1. Sara: Finalize Figma designs with TOTP MFA flow by Thursday, Nov 20.
+2. Arjun: Review and approve David's AWS auto-shutdown PR by today 5 PM.
+3. David: Deploy PostgreSQL concurrent index migration to staging by Wednesday, Nov 19.
+4. David & Arjun: Execute production database deployment on Sunday at 2 AM.
+5. Priya: Schedule next check-in on Friday at 10 AM.
+
+Priya: Any questions? No? Thank you team, have a productive day!
